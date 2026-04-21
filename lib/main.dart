@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'screens/home_screen.dart';
+import 'screens/splash_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Trynt Group',
+      title: 'Trynt Estoque',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
@@ -46,19 +46,19 @@ class MyApp extends StatelessWidget {
             backgroundColor: const Color(0xFFC9A84C),
             foregroundColor: Colors.white,
             elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(4),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero,
             ),
             padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
             textStyle: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 2,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 3,
             ),
           ),
         ),
       ),
-      home: const HomeScreen(),
+      home: const SplashScreen(),
     );
   }
 }

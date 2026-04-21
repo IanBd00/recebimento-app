@@ -15,13 +15,11 @@ class HomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const Spacer(flex: 2),
-              // Logo
               Image.asset(
                 'assets/logo.png',
                 width: 100,
               ),
               const SizedBox(height: 20),
-              // Nome empresa
               const Text(
                 'TRYNT GROUP',
                 style: TextStyle(
@@ -42,7 +40,6 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               const Spacer(flex: 2),
-              // Divisor dourado
               Container(
                 width: 40,
                 height: 1,
@@ -60,16 +57,32 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 32),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const ScanScreen()),
-                    );
-                  },
-                  child: const Text('INICIAR RECEBIMENTO'),
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.7,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFC9A84C),
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.zero,
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      textStyle: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 3,
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const ScanScreen()),
+                      );
+                    },
+                    child: const Text('INICIAR RECEBIMENTO'),
+                  ),
                 ),
               ),
               const Spacer(flex: 1),
