@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'scan_screen.dart';
+import 'historico_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -15,10 +16,7 @@ class HomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const Spacer(flex: 2),
-              Image.asset(
-                'assets/logo.png',
-                width: 100,
-              ),
+              Image.asset('assets/logo.png', width: 100),
               const SizedBox(height: 20),
               const Text(
                 'TRYNT GROUP',
@@ -40,11 +38,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               const Spacer(flex: 2),
-              Container(
-                width: 40,
-                height: 1,
-                color: const Color(0xFFC9A84C),
-              ),
+              Container(width: 40, height: 1, color: const Color(0xFFC9A84C)),
               const SizedBox(height: 32),
               const Text(
                 'Escaneie as caixas para registrar\no recebimento de mercadorias.',
@@ -82,6 +76,24 @@ class HomeScreen extends StatelessWidget {
                       );
                     },
                     child: const Text('INICIAR RECEBIMENTO'),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const HistoricoScreen()),
+                  );
+                },
+                child: const Text(
+                  'VER HISTÓRICO',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Color(0xFF888888),
+                    letterSpacing: 2,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),

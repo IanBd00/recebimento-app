@@ -3,11 +3,10 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'relatorio_screen.dart';
-
-const String baseUrl = 'https://web-production-7c79c.up.railway.app';
+// import 'package:flutter/foundation.dart';
 
 const Color kGold = Color(0xFFC9A84C);
-const Color kGoldLight = Color(0xFFE8C97A);
+const String baseUrl = 'https://web-production-7c79c.up.railway.app';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -90,10 +89,7 @@ class _ScanScreenState extends State<ScanScreen> {
       content: Text(
         '${produto['nome']}  ·  $qtd cx',
         style: const TextStyle(
-          fontSize: 12,
-          letterSpacing: 0.5,
-          color: Colors.white,
-        ),
+            fontSize: 12, letterSpacing: 0.5, color: Colors.white),
       ),
       duration: const Duration(milliseconds: 600),
       backgroundColor: kGold,
@@ -102,10 +98,81 @@ class _ScanScreenState extends State<ScanScreen> {
       margin: const EdgeInsets.all(16),
     ));
 
-    http.post(Uri.parse('$baseUrl/recebimento/$recebimentoId/item?dun14=$dun14'));
+    http.post(
+        Uri.parse('$baseUrl/recebimento/$recebimentoId/item?dun14=$dun14'));
 
     await Future.delayed(const Duration(milliseconds: 1000));
     setState(() => debounceAtivo = false);
+  }
+
+  Future<String?> _pedirNomeRecebimento() async {
+    final controller = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+        title: const Text(
+          'FINALIZAR RECEBIMENTO',
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 2,
+            color: Color(0xFF1A1A1A),
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Dê um nome para identificar este recebimento.',
+              style: TextStyle(fontSize: 12, color: Color(0xFF666666)),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: controller,
+              autofocus: true,
+              style: const TextStyle(fontSize: 13),
+              decoration: const InputDecoration(
+                hintText: 'Ex: Nota fiscal 1234',
+                hintStyle: TextStyle(fontSize: 12, color: Color(0xFFAAAAAA)),
+                border: OutlineInputBorder(borderRadius: BorderRadius.zero),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: BorderSide(color: kGold),
+                ),
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text(
+              'CANCELAR',
+              style: TextStyle(
+                  fontSize: 11, color: Color(0xFF888888), letterSpacing: 1.5),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, controller.text.trim()),
+            child: const Text(
+              'SALVAR',
+              style: TextStyle(
+                fontSize: 11,
+                color: kGold,
+                letterSpacing: 1.5,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _mostrarErro(String msg) {
@@ -129,13 +196,23 @@ class _ScanScreenState extends State<ScanScreen> {
             Padding(
               padding: const EdgeInsets.only(right: 12),
               child: TextButton(
-                onPressed: () {
+                onPressed: () async {
+                  final nome = await _pedirNomeRecebimento();
+                  if (nome == null || nome.isEmpty) return;
+
+                  await http.patch(
+                    Uri.parse(
+                      '$baseUrl/recebimento/$recebimentoId/finalizar?nome=${Uri.encodeComponent(nome)}',
+                    ),
+                  );
+
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (_) => RelatorioScreen(
                         recebimentoId: recebimentoId!,
                         itens: itens,
+                        nome: nome,
                       ),
                     ),
                   );
@@ -159,7 +236,6 @@ class _ScanScreenState extends State<ScanScreen> {
       ),
       body: Column(
         children: [
-          // Câmera
           Expanded(
             flex: 3,
             child: Stack(
@@ -167,13 +243,30 @@ class _ScanScreenState extends State<ScanScreen> {
                 MobileScanner(
                   controller: cameraController,
                   onDetect: (capture) {
-                    final barcode = capture.barcodes.first;
-                    if (barcode.rawValue != null) {
-                      _processarScan(barcode.rawValue!);
+                    // 1. Sempre verifique se a lista não está vazia antes de usar .first
+                    if (capture.barcodes.isEmpty) return;
+
+                    // 2. Pegue o valor com segurança
+                    final String? code = capture.barcodes.first.rawValue;
+
+                    // 3. Só processe se houver um conteúdo válido
+                    if (code != null && code.isNotEmpty) {
+                      _processarScan(code);
                     }
                   },
                 ),
-                // Overlay de mira
+                // Retirar o comentário abaixo para adicionar um botão de teste no modo web, que simula a leitura de um código DUN-14 específico. 
+                // Lembre-se de substituir "10012345678901" por um código válido presente no seu banco de dados para testes.
+                //  if (kIsWeb)
+                //    Positioned(
+                //      bottom: 20,
+                //      right: 20,
+                //      child: FloatingActionButton(
+                //        onPressed: () => _processarScan(
+                //            "10012345678901"), // Um DUN-14 que exista no seu banco
+                //        child: const Icon(Icons.bug_report),
+                //      ),
+                //    ),
                 Center(
                   child: Container(
                     width: 220,
@@ -184,7 +277,6 @@ class _ScanScreenState extends State<ScanScreen> {
                     ),
                   ),
                 ),
-                // Flash branco do debounce
                 if (debounceAtivo)
                   AnimatedOpacity(
                     opacity: debounceAtivo ? 1.0 : 0.0,
@@ -192,20 +284,15 @@ class _ScanScreenState extends State<ScanScreen> {
                     child: Container(
                       color: Colors.white,
                       child: const Center(
-                        child: Icon(
-                          Icons.check_circle_outline,
-                          color: kGold,
-                          size: 56,
-                        ),
+                        child: Icon(Icons.check_circle_outline,
+                            color: kGold, size: 56),
                       ),
                     ),
                   ),
               ],
             ),
           ),
-          // Divisor
           Container(height: 1, color: const Color(0xFFF0F0F0)),
-          // Lista de itens
           Expanded(
             flex: 2,
             child: itens.isEmpty
@@ -219,10 +306,9 @@ class _ScanScreenState extends State<ScanScreen> {
                         Text(
                           'Nenhum item escaneado',
                           style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade400,
-                            letterSpacing: 0.5,
-                          ),
+                              fontSize: 12,
+                              color: Colors.grey.shade400,
+                              letterSpacing: 0.5),
                         ),
                       ],
                     ),
@@ -245,10 +331,9 @@ class _ScanScreenState extends State<ScanScreen> {
                             child: Text(
                               itens[i]['nome'],
                               style: const TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFF333333),
-                                letterSpacing: 0.2,
-                              ),
+                                  fontSize: 12,
+                                  color: Color(0xFF333333),
+                                  letterSpacing: 0.2),
                             ),
                           ),
                           Container(

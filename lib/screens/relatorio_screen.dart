@@ -5,11 +5,13 @@ const Color kGold = Color(0xFFC9A84C);
 class RelatorioScreen extends StatelessWidget {
   final int recebimentoId;
   final List<Map<String, dynamic>> itens;
+  final String nome;
 
   const RelatorioScreen({
     super.key,
     required this.recebimentoId,
     required this.itens,
+    required this.nome,
   });
 
   int get totalCaixas =>
@@ -28,7 +30,6 @@ class RelatorioScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          // Header com resumo
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
             child: Row(
@@ -38,9 +39,9 @@ class RelatorioScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Recebimento #$recebimentoId',
+                        nome,
                         style: const TextStyle(
-                          fontSize: 13,
+                          fontSize: 14,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.5,
                           color: Color(0xFF1A1A1A),
@@ -48,7 +49,7 @@ class RelatorioScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        '${itens.length} produto(s)  ·  $totalCaixas caixas no total',
+                        'Recebimento #$recebimentoId  ·  ${itens.length} produto(s)  ·  $totalCaixas cx',
                         style: const TextStyle(
                           fontSize: 11,
                           color: Color(0xFF888888),
@@ -58,16 +59,11 @@ class RelatorioScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                Container(
-                  width: 40,
-                  height: 1,
-                  color: kGold,
-                ),
+                Container(width: 40, height: 1, color: kGold),
               ],
             ),
           ),
           Container(height: 1, color: const Color(0xFFF0F0F0)),
-          // Lista
           Expanded(
             child: ListView.separated(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -79,8 +75,7 @@ class RelatorioScreen extends StatelessWidget {
                 color: Color(0xFFF5F5F5),
               ),
               itemBuilder: (_, i) => Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 child: Row(
                   children: [
                     Expanded(
@@ -108,8 +103,7 @@ class RelatorioScreen extends StatelessWidget {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 5),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                       decoration: BoxDecoration(
                         color: const Color(0xFFFAF5E9),
                         borderRadius: BorderRadius.circular(2),
@@ -129,14 +123,12 @@ class RelatorioScreen extends StatelessWidget {
               ),
             ),
           ),
-          // Botão concluir
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () =>
-                    Navigator.popUntil(context, (route) => route.isFirst),
+                onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
                 child: const Text('CONCLUIR'),
               ),
             ),
