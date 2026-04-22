@@ -28,20 +28,6 @@ flutter_launcher_icons:
   adaptive_icon_background: "#FFFFFF"
   adaptive_icon_foreground: "assets/icone.png"
 
-flutter_native_splash:
-  color: "#FFFFFF"
-  image: "assets/icone.png" # Usando o ícone quadrado
-  android_gravity: center
-  
-  # Força o branco no modo escuro
-  color_dark: "#FFFFFF"
-  image_dark: "assets/icone.png"
-  
-  # Configuração específica para Android 12+
-  android_12:
-    image: "assets/icone.png"
-    color: "#FFFFFF"
-    icon_background_color: "#FFFFFF"
 
 flutter:
   uses-material-design: true
