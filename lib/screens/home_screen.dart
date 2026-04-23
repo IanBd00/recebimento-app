@@ -79,21 +79,23 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const HistoricoScreen()),
-                  );
-                },
-                child: const Text(
-                  'VER HISTÓRICO',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Color(0xFF888888),
-                    letterSpacing: 2,
-                    fontWeight: FontWeight.w500,
+              const SizedBox(height: 12),
+              Center(
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const HistoricoScreen()),
+                    );
+                  },
+                  child: const Text(
+                    'VER HISTÓRICO',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Color(0xFF888888),
+                      letterSpacing: 2,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ),

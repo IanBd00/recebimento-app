@@ -3,7 +3,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'relatorio_screen.dart';
-// import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 
 const Color kGold = Color(0xFFC9A84C);
 const String baseUrl = 'https://web-production-7c79c.up.railway.app';
@@ -105,76 +105,6 @@ class _ScanScreenState extends State<ScanScreen> {
     setState(() => debounceAtivo = false);
   }
 
-  Future<String?> _pedirNomeRecebimento() async {
-    final controller = TextEditingController();
-    return showDialog<String>(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: Colors.white,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-        title: const Text(
-          'FINALIZAR RECEBIMENTO',
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 2,
-            color: Color(0xFF1A1A1A),
-          ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Dê um nome para identificar este recebimento.',
-              style: TextStyle(fontSize: 12, color: Color(0xFF666666)),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: controller,
-              autofocus: true,
-              style: const TextStyle(fontSize: 13),
-              decoration: const InputDecoration(
-                hintText: 'Ex: Nota fiscal 1234',
-                hintStyle: TextStyle(fontSize: 12, color: Color(0xFFAAAAAA)),
-                border: OutlineInputBorder(borderRadius: BorderRadius.zero),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.zero,
-                  borderSide: BorderSide(color: kGold),
-                ),
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text(
-              'CANCELAR',
-              style: TextStyle(
-                  fontSize: 11, color: Color(0xFF888888), letterSpacing: 1.5),
-            ),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, controller.text.trim()),
-            child: const Text(
-              'SALVAR',
-              style: TextStyle(
-                fontSize: 11,
-                color: kGold,
-                letterSpacing: 1.5,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _mostrarErro(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(msg, style: const TextStyle(fontSize: 12)),
@@ -196,23 +126,13 @@ class _ScanScreenState extends State<ScanScreen> {
             Padding(
               padding: const EdgeInsets.only(right: 12),
               child: TextButton(
-                onPressed: () async {
-                  final nome = await _pedirNomeRecebimento();
-                  if (nome == null || nome.isEmpty) return;
-
-                  await http.patch(
-                    Uri.parse(
-                      '$baseUrl/recebimento/$recebimentoId/finalizar?nome=${Uri.encodeComponent(nome)}',
-                    ),
-                  );
-
+                onPressed: () {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (_) => RelatorioScreen(
                         recebimentoId: recebimentoId!,
                         itens: itens,
-                        nome: nome,
                       ),
                     ),
                   );
@@ -243,30 +163,27 @@ class _ScanScreenState extends State<ScanScreen> {
                 MobileScanner(
                   controller: cameraController,
                   onDetect: (capture) {
-                    // 1. Sempre verifique se a lista não está vazia antes de usar .first
                     if (capture.barcodes.isEmpty) return;
-
-                    // 2. Pegue o valor com segurança
                     final String? code = capture.barcodes.first.rawValue;
-
-                    // 3. Só processe se houver um conteúdo válido
                     if (code != null && code.isNotEmpty) {
                       _processarScan(code);
                     }
                   },
                 ),
-                // Retirar o comentário abaixo para adicionar um botão de teste no modo web, que simula a leitura de um código DUN-14 específico. 
+                // Retirar o comentário abaixo para adicionar um botão de teste no modo web, que simula a leitura de um código DUN-14 específico.
                 // Lembre-se de substituir "10012345678901" por um código válido presente no seu banco de dados para testes.
-                //  if (kIsWeb)
-                //    Positioned(
-                //      bottom: 20,
-                //      right: 20,
-                //      child: FloatingActionButton(
-                //        onPressed: () => _processarScan(
-                //            "10012345678901"), // Um DUN-14 que exista no seu banco
-                //        child: const Icon(Icons.bug_report),
-                //      ),
-                //    ),
+                if (kIsWeb)
+                  Positioned(
+                    bottom: 20,
+                    right: 20,
+                    child: FloatingActionButton(
+                      onPressed: () => _processarScan(
+                          "10012345678901"), // Um DUN-14 que exista no seu banco
+
+                      child: const Icon(Icons.bug_report),
+                    ),
+                  ),
+
                 Center(
                   child: Container(
                     width: 220,
