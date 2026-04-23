@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'home_screen.dart';
+import 'login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,6 +15,7 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _controller;
   late Animation<double> _fadeIn;
   late Animation<double> _fadeOut;
+  final _storage = const FlutterSecureStorage();
 
   @override
   void initState() {
@@ -36,17 +39,22 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
 
-    _controller.forward().then((_) {
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (_, __, ___) => const HomeScreen(),
-          transitionsBuilder: (_, animation, __, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 400),
-        ),
-      );
+    _controller.forward().then((_) async {
+      final autenticado = await _storage.read(key: 'autenticado');
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (_, __, ___) => autenticado == 'true'
+                ? const HomeScreen()
+                : const LoginScreen(),
+            transitionsBuilder: (_, animation, __, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            transitionDuration: const Duration(milliseconds: 400),
+          ),
+        );
+      }
     });
   }
 
@@ -64,15 +72,12 @@ class _SplashScreenState extends State<SplashScreen>
         child: AnimatedBuilder(
           animation: _controller,
           builder: (_, __) {
-            final opacity = _controller.value < 0.7
+            final opacity = _controller.value < 0.75
                 ? _fadeIn.value
                 : _fadeOut.value;
             return Opacity(
               opacity: opacity,
-              child: Image.asset(
-                'assets/logo.png',
-                width: 120,
-              ),
+              child: Image.asset('assets/logo.png', width: 120),
             );
           },
         ),

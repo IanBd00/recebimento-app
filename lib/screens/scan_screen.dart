@@ -3,7 +3,6 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'relatorio_screen.dart';
-import 'package:flutter/foundation.dart';
 
 const Color kGold = Color(0xFFC9A84C);
 const String baseUrl = 'https://web-production-7c79c.up.railway.app';
@@ -15,7 +14,8 @@ class ScanScreen extends StatefulWidget {
   State<ScanScreen> createState() => _ScanScreenState();
 }
 
-class _ScanScreenState extends State<ScanScreen> {
+class _ScanScreenState extends State<ScanScreen>
+    with SingleTickerProviderStateMixin {
   int? recebimentoId;
   List<Map<String, dynamic>> itens = [];
   bool processando = false;
@@ -24,11 +24,22 @@ class _ScanScreenState extends State<ScanScreen> {
   DateTime? ultimaLeitura;
   final MobileScannerController cameraController = MobileScannerController();
   final Map<String, Map<String, dynamic>> cacheProdutos = {};
+  late AnimationController _lineController;
+  late Animation<double> _lineAnimation;
+
+  int get totalCaixas =>
+      itens.fold(0, (sum, i) => sum + (i['quantidade'] as int));
 
   @override
   void initState() {
     super.initState();
     _iniciarRecebimento();
+    _lineController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+    _lineAnimation =
+        Tween<double>(begin: 0.0, end: 1.0).animate(_lineController);
   }
 
   Future<void> _iniciarRecebimento() async {
@@ -60,7 +71,8 @@ class _ScanScreenState extends State<ScanScreen> {
 
     Map<String, dynamic>? produto = cacheProdutos[dun14];
     if (produto == null) {
-      final produtoRes = await http.get(Uri.parse('$baseUrl/produto/$dun14'));
+      final produtoRes =
+          await http.get(Uri.parse('$baseUrl/produto/$dun14'));
       if (produtoRes.statusCode != 200) {
         _mostrarErro('Produto não encontrado: $dun14');
         setState(() {
@@ -78,7 +90,11 @@ class _ScanScreenState extends State<ScanScreen> {
       if (index >= 0) {
         itens[index]['quantidade'] += 1;
       } else {
-        itens.add({'nome': produto!['nome'], 'dun14': dun14, 'quantidade': 1});
+        itens.add({
+          'nome': produto!['nome'],
+          'dun14': dun14,
+          'quantidade': 1,
+        });
       }
       processando = false;
     });
@@ -94,7 +110,7 @@ class _ScanScreenState extends State<ScanScreen> {
       duration: const Duration(milliseconds: 600),
       backgroundColor: kGold,
       behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       margin: const EdgeInsets.all(16),
     ));
 
@@ -110,9 +126,16 @@ class _ScanScreenState extends State<ScanScreen> {
       content: Text(msg, style: const TextStyle(fontSize: 12)),
       backgroundColor: Colors.red.shade700,
       behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       margin: const EdgeInsets.all(16),
     ));
+  }
+
+  @override
+  void dispose() {
+    cameraController.dispose();
+    _lineController.dispose();
+    super.dispose();
   }
 
   @override
@@ -120,7 +143,7 @@ class _ScanScreenState extends State<ScanScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('ESCANEAR CAIXAS'),
+        title: const Text('ESCANEAR'),
         actions: [
           if (itens.isNotEmpty)
             Padding(
@@ -156,44 +179,124 @@ class _ScanScreenState extends State<ScanScreen> {
       ),
       body: Column(
         children: [
-          Expanded(
-            flex: 3,
+          // Câmera
+          SizedBox(
+            height: 180,
             child: Stack(
               children: [
                 MobileScanner(
                   controller: cameraController,
                   onDetect: (capture) {
                     if (capture.barcodes.isEmpty) return;
-                    final String? code = capture.barcodes.first.rawValue;
+                    final code = capture.barcodes.first.rawValue;
                     if (code != null && code.isNotEmpty) {
                       _processarScan(code);
                     }
                   },
                 ),
-                // Retirar o comentário abaixo para adicionar um botão de teste no modo web, que simula a leitura de um código DUN-14 específico.
-                // Lembre-se de substituir "10012345678901" por um código válido presente no seu banco de dados para testes.
-                if (kIsWeb)
-                  Positioned(
-                    bottom: 20,
-                    right: 20,
-                    child: FloatingActionButton(
-                      onPressed: () => _processarScan(
-                          "10012345678901"), // Um DUN-14 que exista no seu banco
-
-                      child: const Icon(Icons.bug_report),
-                    ),
-                  ),
-
+                // Cantos dourados
                 Center(
-                  child: Container(
-                    width: 220,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: kGold, width: 1.5),
-                      borderRadius: BorderRadius.circular(4),
+                  child: SizedBox(
+                    width: 200,
+                    height: 100,
+                    child: Stack(
+                      children: [
+                        // Canto superior esquerdo
+                        Positioned(
+                          top: 0, left: 0,
+                          child: Container(
+                            width: 20, height: 3,
+                            color: kGold,
+                          ),
+                        ),
+                        Positioned(
+                          top: 0, left: 0,
+                          child: Container(
+                            width: 3, height: 20,
+                            color: kGold,
+                          ),
+                        ),
+                        // Canto superior direito
+                        Positioned(
+                          top: 0, right: 0,
+                          child: Container(
+                            width: 20, height: 3,
+                            color: kGold,
+                          ),
+                        ),
+                        Positioned(
+                          top: 0, right: 0,
+                          child: Container(
+                            width: 3, height: 20,
+                            color: kGold,
+                          ),
+                        ),
+                        // Canto inferior esquerdo
+                        Positioned(
+                          bottom: 0, left: 0,
+                          child: Container(
+                            width: 20, height: 3,
+                            color: kGold,
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 0, left: 0,
+                          child: Container(
+                            width: 3, height: 20,
+                            color: kGold,
+                          ),
+                        ),
+                        // Canto inferior direito
+                        Positioned(
+                          bottom: 0, right: 0,
+                          child: Container(
+                            width: 20, height: 3,
+                            color: kGold,
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 0, right: 0,
+                          child: Container(
+                            width: 3, height: 20,
+                            color: kGold,
+                          ),
+                        ),
+                        // Linha de scan animada
+                        AnimatedBuilder(
+                          animation: _lineAnimation,
+                          builder: (_, __) => Positioned(
+                            top: _lineAnimation.value * 94,
+                            left: 0,
+                            right: 0,
+                            child: Container(
+                              height: 1,
+                              color: kGold.withOpacity(0.7),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
+                // Dica
+                Positioned(
+                  bottom: 0, left: 0, right: 0,
+                  child: Container(
+                    color: Colors.black.withOpacity(0.55),
+                    padding: const EdgeInsets.symmetric(vertical: 5),
+                    child: const Text(
+                      'LENDO DUN-14',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 9,
+                        color: kGold,
+                        letterSpacing: 2.5,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                // Flash branco do debounce
                 if (debounceAtivo)
                   AnimatedOpacity(
                     opacity: debounceAtivo ? 1.0 : 0.0,
@@ -201,37 +304,71 @@ class _ScanScreenState extends State<ScanScreen> {
                     child: Container(
                       color: Colors.white,
                       child: const Center(
-                        child: Icon(Icons.check_circle_outline,
-                            color: kGold, size: 56),
+                        child: Icon(
+                          Icons.check_circle_outline,
+                          color: kGold,
+                          size: 56,
+                        ),
                       ),
                     ),
                   ),
               ],
             ),
           ),
+
+          // Barra de resumo
+          Container(
+            color: const Color(0xFFFAF8F4),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${itens.length} ${itens.length == 1 ? 'ITEM' : 'ITENS'}',
+                  style: const TextStyle(
+                    fontSize: 9,
+                    color: Color(0xFFAAAAAA),
+                    letterSpacing: 1.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  '$totalCaixas CX TOTAL',
+                  style: const TextStyle(
+                    fontSize: 9,
+                    color: kGold,
+                    letterSpacing: 1.5,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
           Container(height: 1, color: const Color(0xFFF0F0F0)),
+
+          // Lista
           Expanded(
-            flex: 2,
             child: itens.isEmpty
                 ? Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(Icons.qr_code_scanner,
-                            size: 32, color: Colors.grey.shade300),
+                            size: 28, color: Colors.grey.shade300),
                         const SizedBox(height: 10),
                         Text(
                           'Nenhum item escaneado',
                           style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey.shade400,
-                              letterSpacing: 0.5),
+                            fontSize: 11,
+                            color: Colors.grey.shade400,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                       ],
                     ),
                   )
                 : ListView.separated(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    padding: const EdgeInsets.symmetric(vertical: 4),
                     itemCount: itens.length,
                     separatorBuilder: (_, __) => const Divider(
                       height: 1,
@@ -245,20 +382,38 @@ class _ScanScreenState extends State<ScanScreen> {
                       child: Row(
                         children: [
                           Expanded(
-                            child: Text(
-                              itens[i]['nome'],
-                              style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Color(0xFF333333),
-                                  letterSpacing: 0.2),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  itens[i]['nome'],
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFF1A1A1A),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  itens[i]['dun14'],
+                                  style: const TextStyle(
+                                    fontSize: 9,
+                                    color: Color(0xFFAAAAAA),
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFAF5E9),
-                              borderRadius: BorderRadius.circular(2),
+                                horizontal: 10, vertical: 5),
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFFAF5E9),
+                              border: Border(
+                                left: BorderSide(
+                                    color: kGold, width: 2),
+                              ),
                             ),
                             child: Text(
                               '${itens[i]['quantidade']} cx',
@@ -278,11 +433,5 @@ class _ScanScreenState extends State<ScanScreen> {
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    cameraController.dispose();
-    super.dispose();
   }
 }
