@@ -31,11 +31,14 @@ jobs:
       - name: Gera APK
         run: flutter build apk --release --no-shrink
 
+      - name: Renomeia APK
+        run: mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/trynt.apk
+
       - name: Sobe APK como artefato
         uses: actions/upload-artifact@v4
         with:
           name: trynt-estoque-${{ github.run_number }}
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: build/app/outputs/flutter-apk/trynt.apk
           retention-days: 30
 
       - name: Envia para Firebase App Distribution
@@ -44,5 +47,5 @@ jobs:
           appId: ${{ secrets.FIREBASE_APP_ID }}
           token: ${{ secrets.FIREBASE_TOKEN }}
           groups: equipe-trynt
-          file: build/app/outputs/flutter-apk/app-release.apk
+          file: build/app/outputs/flutter-apk/trynt.apk
           releaseNotes: "Build automático #${{ github.run_number }}"
