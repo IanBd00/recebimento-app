@@ -179,9 +179,9 @@ class _ScanScreenState extends State<ScanScreen>
       ),
       body: Column(
         children: [
-          // Câmera
-          SizedBox(
-            height: 180,
+          // Câmera — flex 3 igual ao anterior
+          Expanded(
+            flex: 3,
             child: Stack(
               children: [
                 MobileScanner(
@@ -197,75 +197,31 @@ class _ScanScreenState extends State<ScanScreen>
                 // Cantos dourados
                 Center(
                   child: SizedBox(
-                    width: 200,
-                    height: 100,
+                    width: 220,
+                    height: 110,
                     child: Stack(
                       children: [
-                        // Canto superior esquerdo
-                        Positioned(
-                          top: 0, left: 0,
-                          child: Container(
-                            width: 20, height: 3,
-                            color: kGold,
-                          ),
-                        ),
-                        Positioned(
-                          top: 0, left: 0,
-                          child: Container(
-                            width: 3, height: 20,
-                            color: kGold,
-                          ),
-                        ),
-                        // Canto superior direito
-                        Positioned(
-                          top: 0, right: 0,
-                          child: Container(
-                            width: 20, height: 3,
-                            color: kGold,
-                          ),
-                        ),
-                        Positioned(
-                          top: 0, right: 0,
-                          child: Container(
-                            width: 3, height: 20,
-                            color: kGold,
-                          ),
-                        ),
-                        // Canto inferior esquerdo
-                        Positioned(
-                          bottom: 0, left: 0,
-                          child: Container(
-                            width: 20, height: 3,
-                            color: kGold,
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 0, left: 0,
-                          child: Container(
-                            width: 3, height: 20,
-                            color: kGold,
-                          ),
-                        ),
-                        // Canto inferior direito
-                        Positioned(
-                          bottom: 0, right: 0,
-                          child: Container(
-                            width: 20, height: 3,
-                            color: kGold,
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 0, right: 0,
-                          child: Container(
-                            width: 3, height: 20,
-                            color: kGold,
-                          ),
-                        ),
-                        // Linha de scan animada
+                        Positioned(top: 0, left: 0,
+                            child: Container(width: 22, height: 3, color: kGold)),
+                        Positioned(top: 0, left: 0,
+                            child: Container(width: 3, height: 22, color: kGold)),
+                        Positioned(top: 0, right: 0,
+                            child: Container(width: 22, height: 3, color: kGold)),
+                        Positioned(top: 0, right: 0,
+                            child: Container(width: 3, height: 22, color: kGold)),
+                        Positioned(bottom: 0, left: 0,
+                            child: Container(width: 22, height: 3, color: kGold)),
+                        Positioned(bottom: 0, left: 0,
+                            child: Container(width: 3, height: 22, color: kGold)),
+                        Positioned(bottom: 0, right: 0,
+                            child: Container(width: 22, height: 3, color: kGold)),
+                        Positioned(bottom: 0, right: 0,
+                            child: Container(width: 3, height: 22, color: kGold)),
+                        // Linha animada
                         AnimatedBuilder(
                           animation: _lineAnimation,
                           builder: (_, __) => Positioned(
-                            top: _lineAnimation.value * 94,
+                            top: _lineAnimation.value * 104,
                             left: 0,
                             right: 0,
                             child: Container(
@@ -278,12 +234,12 @@ class _ScanScreenState extends State<ScanScreen>
                     ),
                   ),
                 ),
-                // Dica
+                // Dica inferior
                 Positioned(
                   bottom: 0, left: 0, right: 0,
                   child: Container(
                     color: Colors.black.withOpacity(0.55),
-                    padding: const EdgeInsets.symmetric(vertical: 5),
+                    padding: const EdgeInsets.symmetric(vertical: 6),
                     child: const Text(
                       'LENDO DUN-14',
                       textAlign: TextAlign.center,
@@ -319,7 +275,8 @@ class _ScanScreenState extends State<ScanScreen>
           // Barra de resumo
           Container(
             color: const Color(0xFFFAF8F4),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -346,8 +303,9 @@ class _ScanScreenState extends State<ScanScreen>
           ),
           Container(height: 1, color: const Color(0xFFF0F0F0)),
 
-          // Lista
+          // Lista — flex 2 igual ao anterior
           Expanded(
+            flex: 2,
             child: itens.isEmpty
                 ? Center(
                     child: Column(
@@ -382,37 +340,22 @@ class _ScanScreenState extends State<ScanScreen>
                       child: Row(
                         children: [
                           Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  itens[i]['nome'],
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: Color(0xFF1A1A1A),
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  itens[i]['dun14'],
-                                  style: const TextStyle(
-                                    fontSize: 9,
-                                    color: Color(0xFFAAAAAA),
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ],
+                            child: Text(
+                              itens[i]['nome'],
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Color(0xFF333333),
+                                letterSpacing: 0.2,
+                              ),
                             ),
                           ),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 5),
+                                horizontal: 10, vertical: 4),
                             decoration: const BoxDecoration(
                               color: Color(0xFFFAF5E9),
                               border: Border(
-                                left: BorderSide(
-                                    color: kGold, width: 2),
+                                left: BorderSide(color: kGold, width: 2),
                               ),
                             ),
                             child: Text(

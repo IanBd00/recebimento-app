@@ -41,7 +41,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.example.recebimento_app"
+        applicationId "com.trynt.recebimento_app"
         minSdkVersion 21
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()

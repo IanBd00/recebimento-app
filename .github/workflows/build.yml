@@ -37,3 +37,12 @@ jobs:
           name: trynt-estoque-${{ github.run_number }}
           path: build/app/outputs/flutter-apk/app-release.apk
           retention-days: 30
+
+      - name: Envia para Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          token: ${{ secrets.FIREBASE_TOKEN }}
+          groups: equipe-trynt
+          file: build/app/outputs/flutter-apk/app-release.apk
+          releaseNotes: "Build automático #${{ github.run_number }}"
