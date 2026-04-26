@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../services/pdf_service.dart';
 
 const Color kGold = Color(0xFFC9A84C);
 const String baseUrl = 'https://web-production-7c79c.up.railway.app';
@@ -109,7 +110,8 @@ class _RelatorioScreenState extends State<RelatorioScreen> {
     setState(() => salvando = true);
 
     await http.post(
-      Uri.parse('$baseUrl/historico/?recebimento_id=${widget.recebimentoId}&nome=${Uri.encodeComponent(nome)}'),
+      Uri.parse(
+          '$baseUrl/historico/?recebimento_id=${widget.recebimentoId}&nome=${Uri.encodeComponent(nome)}'),
     );
 
     setState(() => salvando = false);
@@ -133,36 +135,33 @@ class _RelatorioScreenState extends State<RelatorioScreen> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Recebimento #${widget.recebimentoId}',
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.5,
-                          color: Color(0xFF1A1A1A),
-                        ),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        '${widget.itens.length} produto(s)  ·  $totalCaixas caixas no total',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: Color(0xFF888888),
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-                    ],
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+            child: SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: () {
+                  PdfService.gerarRelatorioRecebimento(
+                    context: context,
+                    nomeRecebimento: 'Recebimento #${widget.recebimentoId}',
+                    data: DateTime.now().toString().substring(0, 16),
+                    itens: widget.itens,
+                  );
+                },
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: kGold,
+                  side: const BorderSide(color: kGold),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero,
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  textStyle: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 3,
                   ),
                 ),
-                Container(width: 40, height: 1, color: kGold),
-              ],
+                child: const Text('EXPORTAR PDF'),
+              ),
             ),
           ),
           Container(height: 1, color: const Color(0xFFF0F0F0)),
@@ -177,7 +176,8 @@ class _RelatorioScreenState extends State<RelatorioScreen> {
                 color: Color(0xFFF5F5F5),
               ),
               itemBuilder: (_, i) => Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 child: Row(
                   children: [
                     Expanded(
@@ -205,7 +205,8 @@ class _RelatorioScreenState extends State<RelatorioScreen> {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 5),
                       decoration: BoxDecoration(
                         color: const Color(0xFFFAF5E9),
                         borderRadius: BorderRadius.circular(2),

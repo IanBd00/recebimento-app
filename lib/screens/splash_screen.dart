@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'home_screen.dart';
-import 'login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -15,7 +13,6 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _controller;
   late Animation<double> _fadeIn;
   late Animation<double> _fadeOut;
-  final _storage = const FlutterSecureStorage();
 
   @override
   void initState() {
@@ -39,15 +36,12 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
 
-    _controller.forward().then((_) async {
-      final autenticado = await _storage.read(key: 'autenticado');
+    _controller.forward().then((_) {
       if (mounted) {
         Navigator.pushReplacement(
           context,
           PageRouteBuilder(
-            pageBuilder: (_, __, ___) => autenticado == 'true'
-                ? const HomeScreen()
-                : const LoginScreen(),
+            pageBuilder: (_, __, ___) => const HomeScreen(),
             transitionsBuilder: (_, animation, __, child) {
               return FadeTransition(opacity: animation, child: child);
             },

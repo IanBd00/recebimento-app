@@ -12,12 +12,15 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^1.2.0
-  mobile_scanner: ^5.1.0
+  flutter_zxing: ^1.5.0
   cupertino_icons: ^1.0.6
   sqflite: ^2.3.0
   path: ^1.9.0
   connectivity_plus: ^6.0.3 # Para detectar se há internet
-  flutter_secure_storage: ^9.0.0
+  pdf: ^3.10.8
+  printing: ^5.12.0
+  path_provider: ^2.1.2
+  share_plus: ^9.0.0
 
 dev_dependencies:
   flutter_test:

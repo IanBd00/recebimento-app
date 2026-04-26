@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../services/pdf_service.dart';
 
 const Color kGold = Color(0xFFC9A84C);
 const String baseUrl = 'https://web-production-7c79c.up.railway.app';
@@ -58,6 +59,31 @@ class _HistoricoDetalheScreenState extends State<HistoricoDetalheScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(widget.nome.toUpperCase()),
+        actions: [
+          if (detalhe != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: TextButton(
+                onPressed: () {
+                  PdfService.gerarRelatorioRecebimento(
+                    context: context,
+                    nomeRecebimento: widget.nome,
+                    data: _formatarData(detalhe!['data']),
+                    itens: List<Map<String, dynamic>>.from(detalhe!['itens']),
+                  );
+                },
+                child: const Text(
+                  'EXPORTAR PDF',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: kGold,
+                    letterSpacing: 1.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(height: 1, color: const Color(0xFFF0F0F0)),
@@ -115,7 +141,8 @@ class _HistoricoDetalheScreenState extends State<HistoricoDetalheScreen> {
                     itemBuilder: (_, i) {
                       final item = detalhe!['itens'][i];
                       return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
                         child: Row(
                           children: [
                             Expanded(
@@ -143,7 +170,8 @@ class _HistoricoDetalheScreenState extends State<HistoricoDetalheScreen> {
                               ),
                             ),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 5),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFFAF5E9),
                                 borderRadius: BorderRadius.circular(2),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'historico_detalhe_screen.dart';
+import '../services/pdf_service.dart';
 
 const Color kGold = Color(0xFFC9A84C);
 const String baseUrl = 'https://web-production-7c79c.up.railway.app';
@@ -38,7 +39,8 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
     setState(() => carregando = true);
     String url = '$baseUrl/historico/';
     final params = <String>[];
-    if (dataInicio != null) params.add('data_inicio=${dataInicio!.toIso8601String()}');
+    if (dataInicio != null)
+      params.add('data_inicio=${dataInicio!.toIso8601String()}');
     if (dataFim != null) params.add('data_fim=${dataFim!.toIso8601String()}');
     if (params.isNotEmpty) url += '?${params.join('&')}';
 
@@ -82,7 +84,8 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
             onPressed: () => Navigator.pop(ctx, false),
             child: const Text(
               'CANCELAR',
-              style: TextStyle(fontSize: 10, color: Color(0xFF888888), letterSpacing: 1.5),
+              style: TextStyle(
+                  fontSize: 10, color: Color(0xFF888888), letterSpacing: 1.5),
             ),
           ),
           TextButton(
@@ -128,15 +131,19 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
         final ano = int.parse(digits.substring(4, 8));
         final data = DateTime(ano, mes, dia);
         setState(() {
-          if (isInicio) dataInicio = data;
-          else dataFim = data;
+          if (isInicio)
+            dataInicio = data;
+          else
+            dataFim = data;
         });
         _carregarHistorico();
       } catch (_) {}
     } else {
       setState(() {
-        if (isInicio) dataInicio = null;
-        else dataFim = null;
+        if (isInicio)
+          dataInicio = null;
+        else
+          dataFim = null;
       });
     }
   }
@@ -163,7 +170,28 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
       appBar: AppBar(
         title: const Text('HISTÓRICO'),
         actions: [
-          if (historicos.isNotEmpty)
+          if (historicos.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.only(right: 4),
+              child: TextButton(
+                onPressed: () {
+                  PdfService.gerarRelatorioGeral(
+                    context: context,
+                    historicos: historicos,
+                    periodo: 'Relatório Geral',
+                  );
+                },
+                child: const Text(
+                  'EXPORTAR PDF',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: kGold,
+                    letterSpacing: 1.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.only(right: 12),
               child: TextButton(
@@ -179,6 +207,7 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
                 ),
               ),
             ),
+          ],
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
@@ -196,11 +225,14 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
                     controller: _inicioController,
                     keyboardType: TextInputType.number,
                     onChanged: (v) => _onDataChanged(v, true),
-                    style: const TextStyle(fontSize: 11, color: Color(0xFF1A1A1A)),
+                    style:
+                        const TextStyle(fontSize: 11, color: Color(0xFF1A1A1A)),
                     decoration: const InputDecoration(
                       hintText: 'dd/mm/aaaa',
-                      hintStyle: TextStyle(fontSize: 11, color: Color(0xFFBBBBBB)),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      hintStyle:
+                          TextStyle(fontSize: 11, color: Color(0xFFBBBBBB)),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.zero,
                         borderSide: BorderSide(color: Color(0xFFEEEEEE)),
@@ -218,11 +250,14 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
                     controller: _fimController,
                     keyboardType: TextInputType.number,
                     onChanged: (v) => _onDataChanged(v, false),
-                    style: const TextStyle(fontSize: 11, color: Color(0xFF1A1A1A)),
+                    style:
+                        const TextStyle(fontSize: 11, color: Color(0xFF1A1A1A)),
                     decoration: const InputDecoration(
                       hintText: 'dd/mm/aaaa',
-                      hintStyle: TextStyle(fontSize: 11, color: Color(0xFFBBBBBB)),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      hintStyle:
+                          TextStyle(fontSize: 11, color: Color(0xFFBBBBBB)),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.zero,
                         borderSide: BorderSide(color: Color(0xFFEEEEEE)),
@@ -238,7 +273,8 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
                   const SizedBox(width: 8),
                   GestureDetector(
                     onTap: _limparFiltros,
-                    child: const Icon(Icons.close, size: 18, color: Color(0xFFAAAAAA)),
+                    child: const Icon(Icons.close,
+                        size: 18, color: Color(0xFFAAAAAA)),
                   ),
                 ],
               ],
@@ -248,14 +284,16 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
           Expanded(
             child: carregando
                 ? const Center(
-                    child: CircularProgressIndicator(color: kGold, strokeWidth: 2),
+                    child:
+                        CircularProgressIndicator(color: kGold, strokeWidth: 2),
                   )
                 : historicos.isEmpty
                     ? Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.inbox_outlined, size: 32, color: Colors.grey.shade300),
+                            Icon(Icons.inbox_outlined,
+                                size: 32, color: Colors.grey.shade300),
                             const SizedBox(height: 10),
                             Text(
                               'Nenhum recebimento encontrado',
@@ -314,7 +352,8 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
                                   ),
                                   actions: [
                                     TextButton(
-                                      onPressed: () => Navigator.pop(ctx, false),
+                                      onPressed: () =>
+                                          Navigator.pop(ctx, false),
                                       child: const Text(
                                         'CANCELAR',
                                         style: TextStyle(
@@ -358,7 +397,8 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
                                   children: [
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             h['nome'],
@@ -381,7 +421,8 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
                                       ),
                                     ),
                                     Column(
-                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
                                       children: [
                                         Text(
                                           '${h['total_caixas']} cx',
